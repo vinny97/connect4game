@@ -51,7 +51,7 @@ def create_game():
 def game(game_id):
     if game_id not in games:
         return "Game not found!"
-    return render_template("game.html", game_id=game_id)
+    return render_template("game.html", game_id=game_id, games=games)
 
 @socketio.on("join")
 def on_join(data):
@@ -87,4 +87,4 @@ def on_move(data):
         emit("error", {"message": "Invalid move."}, to=request.sid)
 
 if __name__ == "__main__":
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    socketio.run(app, debug=True)
