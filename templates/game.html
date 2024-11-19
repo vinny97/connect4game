@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect 4</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Connect 4</h1>
+    <div id="board"></div>
+    <p id="turn">Waiting for players...</p>
+    <script>
+        const socket = io();
+        const gameId = "{{ game_id }}";
+        const player = prompt("Enter your name (X or O):");
+        let currentPlayer = "X";
+
+        const boardElement = document.getElementById("board");
+        const turnElement = document.getElementById("turn");
+
+        socket.emit("join", { game_id: gameId, player });
+
+        socket.on("player_joined", (data) => {
+            turnElement.innerText = `Players: ${data.players.join(", ")}. Turn: ${currentPlayer}`;
+        });
+
+        socket.on("update", (data) => {
+            renderBoard(data.board);
+            turnElement.innerText = `Current Turn: ${data.current_turn}`;
+            currentPlayer = data.current_turn;
+        });
+
+        socket.on("game_over", (data) => {
+            alert(`${data.winner} wins!`);
+        });
+
+        function renderBoard(board) {
+            boardElement.innerHTML = "";
+            board.forEach((row, r) => {
+                const rowElement = document.createElement("div");
+                rowElement.className = "row";
+                row.forEach((cell, c) => {
+                    const cellElement = document.createElement("div");
+                    cellElement.className = "cell";
+                    cellElement.innerText = cell;
+                    cellElement.addEventListener("click", () => {
+                        if (currentPlayer === player) {
+                            socket.emit("move", { game_id: gameId, col: c, player });
+                        }
+                    });
+                    rowElement.appendChild(cellElement);
+                });
+                boardElement.appendChild(rowElement);
+            });
+        }
+    </script>
+</body>
+</html>
