@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from flask_socketio import SocketIO, join_room, leave_room, emit
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
-# Store game state in memory
+# This is where we store the game board and state for each game
 games = {}
 
 def create_board():
@@ -22,7 +22,6 @@ def make_move(board, col, player):
     return False
 
 def check_winner(board, player):
-    # Horizontal, vertical, diagonal checks
     for row in range(6):
         for col in range(7):
             if (
@@ -36,7 +35,7 @@ def check_winner(board, player):
 
 @app.route("/")
 def home():
-    return "Welcome to Connect 4! Create a game by visiting /create"
+    return render_template("home.html")
 
 @app.route("/create")
 def create_game():
@@ -46,7 +45,7 @@ def create_game():
         "players": [],
         "current_turn": "X"
     }
-    return f"Game created! Share this link with a friend: /game/{game_id}"
+    return redirect(url_for("game", game_id=game_id))
 
 @app.route("/game/<game_id>")
 def game(game_id):
@@ -88,4 +87,4 @@ def on_move(data):
         emit("error", {"message": "Invalid move."}, to=request.sid)
 
 if __name__ == "__main__":
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    socketio.run(app, debug=True)
