@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect 4</title>
+</head>
+<body>
+    <h1>Welcome to Connect 4!</h1>
+    
+    <!-- Create Game Button -->
+    <a href="/create?game_id=game123">
+        <button>Create Game</button>
+    </a>
+
+    <h2>Or Join an Existing Game</h2>
+    
+    <!-- Form to Join Game -->
+    <form action="/game" method="get">
+        <label for="game_id">Enter Game ID:</label>
+        <input type="text" id="game_id" name="game_id" required>
+        <button type="submit">Join Game</button>
+    </form>
+</body>
+</html>
